@@ -1,0 +1,45 @@
+{
+  "name": "naijaworksbackend",
+  "version": "1.0.0",
+  "description": "this is the backend implementation of the naijaworks hackathon project",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NaijaWorks/backend.git"
+  },
+  "keywords": [
+    "hackathon",
+    "naijahacks",
+    "platform"
+  ],
+  "author": "Josemaria Nriagu, Oloruntobi Awoderu, Isaac Aderogba",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NaijaWorks/backend/issues"
+  },
+  "homepage": "https://github.com/NaijaWorks/backend#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.9.0",
+    "graphql": "^14.5.8",
+    "mongoose": "^5.7.14",
+    "nodemon": "^2.0.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "conventional-changelog-conventionalcommits": "^4.2.3",
+    "crossenv": "0.0.2-security",
+    "dotenv": "^8.2.0",
+    "husky": "^3.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS --verbose"
+    }
+  }
+}
