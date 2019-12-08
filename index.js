@@ -1,6 +1,7 @@
 // required dependencies
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const graphqlHTTP = require('express-graphql');
 const mongoose = require('mongoose');
 
@@ -13,12 +14,13 @@ const app = express();
 const uri = process.env.URI;
 
 // connect to mongodb atlas database using my credentials
-mongoose.connect(uri);
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once('open', () => {
    console.log('Connected to database')
 });
 
 // middleware
+app.use(cors());
 app.use('/graphql', graphqlHTTP({
    schema,
    graphiql: true

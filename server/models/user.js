@@ -14,6 +14,7 @@ const userSchema = new Schema({
    role: String,
    shortBio: String,
    longBio: String,
+   token: String
 });
 
 module.exports = mongoose.model('User', userSchema);
