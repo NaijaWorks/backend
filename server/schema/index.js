@@ -1,4 +1,6 @@
 const graphql = require('graphql');
+const bcrypt = require('bcryptjs');
+const { generateToken } = require('../helpers/tokenize');
 const User = require('../models/user');
 const Project = require('../models/project');
 const Skill = require('../models/skill');
@@ -23,6 +25,7 @@ const UserType = new GraphQLObjectType({
       role: { type: GraphQLString },
       shortBio: { type: GraphQLString },
       longBio: { type: GraphQLString },
+      token: { type: GraphQLString },
       skills: {
          type: new GraphQLList(SkillType),
          resolve(parent, args) {
@@ -104,7 +107,7 @@ const RootQuery = new GraphQLObjectType({
             return Project.find({});
          }
       }
-
+      
    }
 })
 
@@ -163,7 +166,7 @@ const Mutation = new GraphQLObjectType({
             shortBio: { type: new GraphQLNonNull(GraphQLString) },
             longBio: { type: GraphQLString },
          },
-         resolve(parent, args) {
+         async resolve(parent, args) {
             let user = new User({
                firstName: args.firstName,
                lastName: args.lastName,
@@ -172,13 +175,16 @@ const Mutation = new GraphQLObjectType({
                showEmail: args.showEmail,
                phone: args.phone,
                showPhone: args.showPhone,
-               password: args.password,
+               password: bcrypt.hashSync(args.password, 12),
                location: args.location,
                role: args.role,
                shortBio: args.shortBio,
                longBio: args.longBio,
             });
-            return user.save();
+            const savedUser = await user.save();
+            const token = await generateToken(savedUser);
+            savedUser.token = token;
+            return savedUser;
          }
       }
    }
