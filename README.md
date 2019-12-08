@@ -21,6 +21,9 @@ A platform for discovering IT skills within Nigeria. Users will get to create ac
 - To serve as a one stop pool of nigerian tech skills for clients seeking these skills.
 - Reduce rate of unemployment in Nigeria.
 
+## Design Flows & Mockup
+To fully understand our design flows and data schema, see our [Figma Design Document](https://www.figma.com/file/DKxIYlDY6iBsQUP0pbcQ13/NaijaHacks?node-id=0%3A1)
+
 ## What Stacks do we intend to use?
 * Typescript React for Frontend
 * Apollo Client for innteracting to GraphQL server
