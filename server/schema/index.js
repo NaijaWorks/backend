@@ -1,6 +1,7 @@
 const graphql = require('graphql');
 const bcrypt = require('bcryptjs');
 const { generateToken } = require('../helpers/tokenize');
+const r = require('../helpers/responses');
 const User = require('../models/user');
 const Project = require('../models/project');
 const Skill = require('../models/skill');
@@ -123,14 +124,18 @@ const Mutation = new GraphQLObjectType({
             userId: { type: new GraphQLNonNull(GraphQLID) }
          },
          resolve(parent, args) {
-            let project = new Project({
-               title: args.title,
-               imageUrl: args.imageURL,
-               description: args.description,
-               projectURL: args.projectURL,
-               userId: args.userId
-            });
-            return project.save();
+            try {
+               let project = new Project({
+                  title: args.title,
+                  imageUrl: args.imageURL,
+                  description: args.description,
+                  projectURL: args.projectURL,
+                  userId: args.userId
+               });
+               return project.save();
+            } catch (error) {
+               throw new Error(error.message);
+            }
          }
       },
       addSkill: {
@@ -141,15 +146,19 @@ const Mutation = new GraphQLObjectType({
             userId: { type: new GraphQLNonNull(GraphQLID) }
          },
          resolve(parent, args) {
-            let skill = new Skill({
-               name: args.name,
-               logo: args.logo,
-               userId: args.userId
-            });
-            return skill.save();
+            try {
+               let skill = new Skill({
+                  name: args.name,
+                  logo: args.logo,
+                  userId: args.userId
+               });
+               return skill.save();
+            } catch (error) {
+               throw new Error(error.message);
+            }
          }
       },
-      addUser: {
+      register: {
          type: UserType,
          args: {
             firstName: { type: new GraphQLNonNull(GraphQLString) },
@@ -167,7 +176,7 @@ const Mutation = new GraphQLObjectType({
          },
          async resolve(parent, args) {
             try {
-               const user = new User({
+               const newUser = new User({
                   firstName: args.firstName,
                   lastName: args.lastName,
                   photoURL: args.photoURL,
@@ -181,10 +190,15 @@ const Mutation = new GraphQLObjectType({
                   shortBio: args.shortBio,
                   longBio: args.longBio,
                });
-               const savedUser = await user.save();
-               const token = await generateToken(savedUser);
-               savedUser.token = token;
-               return savedUser;
+               const user = await User.findOne({ email: args.email });
+               if (user) {
+                  throw new Error(r.userExists);
+               } else {
+                  const savedUser = await newUser.save();
+                  const token = await generateToken(savedUser);
+                  savedUser.token = token;
+                  return savedUser;
+               }
             } catch (error) {
                throw new Error(error.message);
             }
@@ -204,7 +218,7 @@ const Mutation = new GraphQLObjectType({
                   user.token = token;
                   return user;
                } else {
-                  throw new Error("Invalid credentials");
+                  throw new Error(r.invalid);
                }
             } catch (error) {
                throw new Error(error.message)
@@ -212,7 +226,7 @@ const Mutation = new GraphQLObjectType({
          }
       }
    }
-})
+});
 
 module.exports = new GraphQLSchema({
    query: RootQuery,
