@@ -107,7 +107,6 @@ const RootQuery = new GraphQLObjectType({
             return Project.find({});
          }
       }
-      
    }
 })
 
@@ -167,24 +166,49 @@ const Mutation = new GraphQLObjectType({
             longBio: { type: GraphQLString },
          },
          async resolve(parent, args) {
-            let user = new User({
-               firstName: args.firstName,
-               lastName: args.lastName,
-               photoURL: args.photoURL,
-               email: args.email,
-               showEmail: args.showEmail,
-               phone: args.phone,
-               showPhone: args.showPhone,
-               password: bcrypt.hashSync(args.password, 12),
-               location: args.location,
-               role: args.role,
-               shortBio: args.shortBio,
-               longBio: args.longBio,
-            });
-            const savedUser = await user.save();
-            const token = await generateToken(savedUser);
-            savedUser.token = token;
-            return savedUser;
+            try {
+               const user = new User({
+                  firstName: args.firstName,
+                  lastName: args.lastName,
+                  photoURL: args.photoURL,
+                  email: args.email,
+                  showEmail: args.showEmail,
+                  phone: args.phone,
+                  showPhone: args.showPhone,
+                  password: bcrypt.hashSync(args.password, 12),
+                  location: args.location,
+                  role: args.role,
+                  shortBio: args.shortBio,
+                  longBio: args.longBio,
+               });
+               const savedUser = await user.save();
+               const token = await generateToken(savedUser);
+               savedUser.token = token;
+               return savedUser;
+            } catch (error) {
+               throw new Error(error.message);
+            }
+         }
+      },
+      login: {
+         type: UserType,
+         args: {
+            email: { type: new GraphQLNonNull(GraphQLString) },
+            password: { type: new GraphQLNonNull(GraphQLString) },
+         },
+         async resolve(parent, args) {
+            try {
+               const user = await User.findOne({ email: args.email });
+               if (user && bcrypt.compareSync(args.password, user.password)) {
+                  const token = await generateToken(user);
+                  user.token = token;
+                  return user;
+               } else {
+                  throw new Error("Invalid credentials");
+               }
+            } catch (error) {
+               throw new Error(error.message)
+            }
          }
       }
    }
