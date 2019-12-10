@@ -14,7 +14,7 @@ const app = express();
 const uri = process.env.URI;
 
 // connect to mongodb atlas database using my credentials
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 mongoose.connection.once('open', () => {
    console.log('Connected to database')
 });
