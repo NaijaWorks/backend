@@ -158,37 +158,57 @@ const Mutation = new GraphQLObjectType({
             }
          }
       },
+      updateUser: {
+         type: UserType,
+         args: {
+            id: { type: GraphQLID },
+            firstName: { type: (GraphQLString) },
+            lastName: { type: (GraphQLString) },
+            photoURL: { type: GraphQLString },
+            showEmail: { type: (GraphQLBoolean) },
+            phone: { type: (GraphQLString) },
+            showPhone: { type: (GraphQLBoolean) },
+            location: { type: (GraphQLString) },
+            role: { type: (GraphQLString) },
+            shortBio: { type: (GraphQLString) },
+            longBio: { type: (GraphQLString) }
+         },
+         async resolve(parent, args) {
+            try {
+               const user = await User.findById(args.id);
+               const userToUpdate = {}
+               if (user) {
+                  args.firstName ? userToUpdate.firstName = args.firstName : null;
+                  args.lastName ? userToUpdate.lastName = args.lastName : null;
+                  args.photoURL ? userToUpdate.FFphotoURL = args.photoURL : null;
+                  args.showEmail ? userToUpdate.showEmail = args.showEmail : null;
+                  args.phone ? userToUpdate.phone = args.phone : null;
+                  args.showPhone ? userToUpdate.showPhone = args.showPhone : null
+                  args.location ? userToUpdate.location = args.location : null;
+                  args.location ? userToUpdate.role = args.location : null;
+                  args.shortBio ? userToUpdate.shortBio = args.shortBio : null;
+                  args.longBio ? userToUpdate.longBio = args.longBio : null;
+                  const updatedUser = await User.findOneAndUpdate({ _id: args.id }, userToUpdate, { new: true });
+                  return updatedUser;
+               } else {
+                  throw new Error(r.invalidID)
+               }
+            } catch (error) {
+               throw new Error(error.message);
+            }
+         }
+      },
       register: {
          type: UserType,
          args: {
-            firstName: { type: new GraphQLNonNull(GraphQLString) },
-            lastName: { type: new GraphQLNonNull(GraphQLString) },
-            photoURL: { type: GraphQLString },
             email: { type: new GraphQLNonNull(GraphQLString) },
-            showEmail: { type: new GraphQLNonNull(GraphQLBoolean) },
-            phone: { type: new GraphQLNonNull(GraphQLString) },
-            showPhone: { type: new GraphQLNonNull(GraphQLBoolean) },
             password: { type: new GraphQLNonNull(GraphQLString) },
-            location: { type: new GraphQLNonNull(GraphQLString) },
-            role: { type: new GraphQLNonNull(GraphQLString) },
-            shortBio: { type: new GraphQLNonNull(GraphQLString) },
-            longBio: { type: GraphQLString },
          },
          async resolve(parent, args) {
             try {
                const newUser = new User({
-                  firstName: args.firstName,
-                  lastName: args.lastName,
-                  photoURL: args.photoURL,
                   email: args.email,
-                  showEmail: args.showEmail,
-                  phone: args.phone,
-                  showPhone: args.showPhone,
-                  password: bcrypt.hashSync(args.password, 12),
-                  location: args.location,
-                  role: args.role,
-                  shortBio: args.shortBio,
-                  longBio: args.longBio,
+                  password: bcrypt.hashSync(args.password, 12)
                });
                const user = await User.findOne({ email: args.email });
                if (user) {
