@@ -180,7 +180,7 @@ const Mutation = new GraphQLObjectType({
                if (user) {
                   args.firstName ? userToUpdate.firstName = args.firstName : null;
                   args.lastName ? userToUpdate.lastName = args.lastName : null;
-                  args.photoURL ? userToUpdate.FFphotoURL = args.photoURL : null;
+                  args.photoURL ? userToUpdate.photoURL = args.photoURL : null;
                   args.showEmail ? userToUpdate.showEmail = args.showEmail : null;
                   args.phone ? userToUpdate.phone = args.phone : null;
                   args.showPhone ? userToUpdate.showPhone = args.showPhone : null
