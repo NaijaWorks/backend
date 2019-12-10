@@ -10,6 +10,9 @@ const schema = require('./server/schema');
 
 const app = express();
 
+// import cloudinary helper
+const cloudRouter = require('./server/helpers/cloudRouter');
+
 //define URI
 const uri = process.env.URI;
 
@@ -21,6 +24,7 @@ mongoose.connection.once('open', () => {
 
 // middleware
 app.use(cors());
+app.use('/api', cloudRouter);
 app.use('/graphql', graphqlHTTP({
    schema,
    graphiql: true
