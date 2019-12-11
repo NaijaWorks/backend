@@ -38,9 +38,10 @@ app.use('/graphql', graphqlHTTP({
 // send base response using REST
 app.get('/', (req, res) => {
    try {
-      res.status(200).json(r.connected(req.ip));
+      const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+      res.status(200).json(r.connected(ip));
    } catch (error) {
-      res.status(500).json(error.message); l
+      res.status(500).json(error.message);
    }
 })
 
