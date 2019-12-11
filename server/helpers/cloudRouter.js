@@ -15,7 +15,7 @@ router.post('/v1/upload', multerUploads, async (req, res) => {
             image: url
          })
       } else {
-         res.status(403).json(r.missing);
+         res.status(400).json(r.missing);
       }
    } catch (error) {
       res.status(500).json(error.message);
