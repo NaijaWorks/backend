@@ -40,9 +40,11 @@
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
     "conventional-changelog-conventionalcommits": "^4.2.3",
-    "crossenv": "0.0.2-security",
+    "cross-env": "^6.0.3",
     "dotenv": "^8.2.0",
-    "husky": "^3.1.0"
+    "husky": "^3.1.0",
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
   },
   "husky": {
     "hooks": {
