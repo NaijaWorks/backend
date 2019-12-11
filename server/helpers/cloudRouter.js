@@ -21,3 +21,5 @@ router.post('/v1/upload', multerUploads, async (req, res) => {
       res.status(500).json(error.message);
    }
 })
+
+module.exports = router;
