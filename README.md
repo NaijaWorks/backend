@@ -24,6 +24,9 @@ A platform for discovering IT skills within Nigeria. Users will get to create ac
 ## Design Flows & Mockup
 To fully understand our design flows and data schema, see our [Figma Design Document](https://www.figma.com/file/DKxIYlDY6iBsQUP0pbcQ13/NaijaHacks?node-id=0%3A1)
 
+## Devpost Article
+Click [here](https://devpost.com/software/naijaworks-1t07vm/) to see detailed information on Devpost
+
 ## What Stacks do we intend to use?
 * Typescript React for Frontend
 * Apollo Client for innteracting to GraphQL server
