@@ -1,5 +1,5 @@
 module.exports = {
-   connected: (ip) =>  `Active connection established to Server via ${ip}`,
+   connected: (ip) =>  `Active connection to Server established via ${ip}`,
    userExists: "User with email already exists",
    invalid: "Invalid credentials",
    invalidID: "User with id not found",
