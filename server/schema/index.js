@@ -50,8 +50,10 @@ const SkillType = new GraphQLObjectType({
       logo: { type: GraphQLString },
       user: {
          type: UserType,
-         resolve(parent, args) {
-            return User.findById(parent.userId)
+         async resolve(parent, args) {
+            const user = await User.findById(parent.userId);
+            user.password = r.hidden;
+            return user
          }
       }
    })
@@ -67,8 +69,10 @@ const ProjectType = new GraphQLObjectType({
       projectURL: { type: GraphQLString },
       user: {
          type: UserType,
-         resolve(parent, args) {
-            return User.findById(parent.userId)
+         async resolve(parent, args) {
+            const user = await User.findById(parent.userId);
+            user.password = r.hidden;
+            return user
          }
       }
    })
@@ -83,8 +87,10 @@ const RootQuery = new GraphQLObjectType({
          args: {
             id: { type: GraphQLID }
          },
-         resolve(parent, args) {
-            return User.findById(args.id);
+         async resolve(parent, args) {
+            const user = await User.findById(args.id);
+            user.password = r.hidden;
+            return user
          }
       },
       project: {
@@ -98,8 +104,10 @@ const RootQuery = new GraphQLObjectType({
       },
       users: {
          type: new GraphQLList(UserType),
-         resolve(parent, args) {
-            return User.find({});
+         async resolve(parent, args) {
+            const users = await User.find({})
+            users.forEach(user => user.password = r.hidden)
+            return users;
          }
       },
       projects: {
@@ -158,8 +166,26 @@ const Mutation = new GraphQLObjectType({
                   args.imageURL ? projectToUpdate.imageURL = args.imageURL : null
                   args.description ? projectToUpdate.description = args.description : null
                   args.projectURL ? projectToUpdate.projectURL = args.projectURL : null
-                  const updatedProject = await User.findOneAndUpdate({ _id: args.projectId }, projectToUpdate, { new: true });
+                  const updatedProject = await Project.findOneAndUpdate({ _id: args.projectId }, projectToUpdate, { new: true });
                   return updatedProject;
+               } else {
+                  throw new Error(r.supplyToken);
+               }
+            } catch (error) {
+               throw new Error(error.message);
+            }
+         }
+      },
+      deleteProject: {
+         type: ProjectType,
+         args: {
+            projectId: { type: GraphQLID }
+         },
+         async resolve(parent, args, context) {
+            try {
+               if (context.user) {
+                  const deletedProject = await Project.findOneAndDelete({ _id: args.projectId });
+                  return deletedProject;
                } else {
                   throw new Error(r.supplyToken);
                }
@@ -199,8 +225,8 @@ const Mutation = new GraphQLObjectType({
          async resolve(parent, args, context) {
             try {
                if (context.user) {
-                  await Skill.findOneAndDelete({ _id: args.skillId })
-                  return context.user
+                  const deletedSkill = await Skill.findOneAndDelete({ _id: args.skillId });
+                  return deletedSkill;
                } else {
                   throw new Error(r.supplyToken);
                }
