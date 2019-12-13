@@ -121,18 +121,48 @@ const Mutation = new GraphQLObjectType({
             imageURL: { type: GraphQLString },
             description: { type: new GraphQLNonNull(GraphQLString) },
             projectURL: { type: GraphQLString },
-            userId: { type: new GraphQLNonNull(GraphQLID) }
          },
-         resolve(parent, args) {
+         resolve(parent, args, context) {
             try {
-               let project = new Project({
-                  title: args.title,
-                  imageUrl: args.imageURL,
-                  description: args.description,
-                  projectURL: args.projectURL,
-                  userId: args.userId
-               });
-               return project.save();
+               if (context.user) {
+                  let project = new Project({
+                     title: args.title,
+                     imageUrl: args.imageURL,
+                     description: args.description,
+                     projectURL: args.projectURL,
+                     userId: context.user.id
+                  });
+                  return project.save();
+               } else {
+                  throw new Error(r.supplyToken);
+               }
+            } catch (error) {
+               throw new Error(error.message);
+            }
+         }
+      },
+      updateProject: {
+         type: ProjectType,
+         args: {
+            projectId: { type: GraphQLID },
+            title: { type: (GraphQLString) },
+            imageURL: { type: GraphQLString },
+            description: { type: (GraphQLString) },
+            projectURL: { type: GraphQLString },
+         },
+         async resolve(parent, args, context) {
+            try {
+               const projectToUpdate = {}
+               if (context.user) {
+                  args.title ? projectToUpdate.title = args.title : null
+                  args.imageURL ? projectToUpdate.imageURL = args.imageURL : null
+                  args.description ? projectToUpdate.description = args.description : null
+                  args.projectURL ? projectToUpdate.projectURL = args.projectURL : null
+                  const updatedProject = await User.findOneAndUpdate({ _id: args.projectId }, projectToUpdate, { new: true });
+                  return updatedProject;
+               } else {
+                  throw new Error(r.supplyToken);
+               }
             } catch (error) {
                throw new Error(error.message);
             }
@@ -142,17 +172,38 @@ const Mutation = new GraphQLObjectType({
          type: SkillType,
          args: {
             name: { type: new GraphQLNonNull(GraphQLString) },
-            logo: { type: GraphQLString },
-            userId: { type: new GraphQLNonNull(GraphQLID) }
+            logo: { type: GraphQLString }
          },
-         resolve(parent, args) {
+         resolve(parent, args, context) {
             try {
-               let skill = new Skill({
-                  name: args.name,
-                  logo: args.logo,
-                  userId: args.userId
-               });
-               return skill.save();
+               if (context.user) {
+                  let skill = new Skill({
+                     name: args.name,
+                     logo: args.logo,
+                     userId: context.user.id
+                  });
+                  return skill.save();
+               } else {
+                  throw new Error(r.supplyToken);
+               }
+            } catch (error) {
+               throw new Error(error.message);
+            }
+         }
+      },
+      deleteSkill: {
+         type: SkillType,
+         args: {
+            skillId: { type: GraphQLID }
+         },
+         async resolve(parent, args, context) {
+            try {
+               if (context.user) {
+                  await Skill.findOneAndDelete({ _id: args.skillId })
+                  return context.user
+               } else {
+                  throw new Error(r.supplyToken);
+               }
             } catch (error) {
                throw new Error(error.message);
             }
@@ -161,7 +212,6 @@ const Mutation = new GraphQLObjectType({
       updateUser: {
          type: UserType,
          args: {
-            id: { type: GraphQLID },
             firstName: { type: (GraphQLString) },
             lastName: { type: (GraphQLString) },
             photoURL: { type: GraphQLString },
@@ -173,11 +223,10 @@ const Mutation = new GraphQLObjectType({
             shortBio: { type: (GraphQLString) },
             longBio: { type: (GraphQLString) }
          },
-         async resolve(parent, args) {
+         async resolve(parent, args, context) {
             try {
-               const user = await User.findById(args.id);
                const userToUpdate = {}
-               if (user) {
+               if (context.user) {
                   args.firstName ? userToUpdate.firstName = args.firstName : null;
                   args.lastName ? userToUpdate.lastName = args.lastName : null;
                   args.photoURL ? userToUpdate.photoURL = args.photoURL : null;
@@ -185,13 +234,13 @@ const Mutation = new GraphQLObjectType({
                   args.phone ? userToUpdate.phone = args.phone : null;
                   args.showPhone ? userToUpdate.showPhone = args.showPhone : null
                   args.location ? userToUpdate.location = args.location : null;
-                  args.location ? userToUpdate.role = args.location : null;
+                  args.role ? userToUpdate.role = args.role : null;
                   args.shortBio ? userToUpdate.shortBio = args.shortBio : null;
                   args.longBio ? userToUpdate.longBio = args.longBio : null;
-                  const updatedUser = await User.findOneAndUpdate({ _id: args.id }, userToUpdate, { new: true });
+                  const updatedUser = await User.findOneAndUpdate({ _id: context.user.id }, userToUpdate, { new: true });
                   return updatedUser;
                } else {
-                  throw new Error(r.invalidID)
+                  throw new Error(r.supplyToken)
                }
             } catch (error) {
                throw new Error(error.message);
