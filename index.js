@@ -9,10 +9,14 @@ const mongoose = require('mongoose');
 // import schema file
 const schema = require('./server/schema');
 
+// define app
 const app = express();
 
 // import cloudinary helper
 const cloudRouter = require('./server/helpers/cloudRouter');
+
+// import restrict middleware
+const { restrict } = require('./server/helpers/tokenize');
 
 // import responses
 const r = require('./server/helpers/responses');
@@ -30,10 +34,18 @@ mongoose.connection.once('open', () => {
 app.use(helmet());
 app.use(cors());
 app.use('/api', cloudRouter);
-app.use('/graphql', graphqlHTTP({
-   schema,
-   graphiql: true
-}));
+app.use(
+   '/graphql',
+   graphqlHTTP(async (request, response, graphQLParams) => ({
+      schema: schema,
+      graphiql: true,
+      context: {
+         request: request,
+         user: await restrict(request.headers.authorization)
+      }
+   }))
+);
+
 
 // send base response using REST
 app.get('/', (req, res) => {
