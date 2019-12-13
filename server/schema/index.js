@@ -292,6 +292,7 @@ const Mutation = new GraphQLObjectType({
                   const savedUser = await newUser.save();
                   const token = await generateToken(savedUser);
                   savedUser.token = token;
+                  savedUser.password = r.hidden;
                   return savedUser;
                }
             } catch (error) {
@@ -311,6 +312,7 @@ const Mutation = new GraphQLObjectType({
                if (user && bcrypt.compareSync(args.password, user.password)) {
                   const token = await generateToken(user);
                   user.token = token;
+                  user.password = r.hidden;
                   return user;
                } else {
                   throw new Error(r.invalid);
