@@ -281,19 +281,23 @@ const Mutation = new GraphQLObjectType({
          },
          async resolve(parent, args) {
             try {
-               const newUser = new User({
-                  email: args.email,
-                  password: bcrypt.hashSync(args.password, 12)
-               });
-               const user = await User.findOne({ email: args.email });
-               if (user) {
-                  throw new Error(r.userExists);
+               if (r.mailRegex.test(args.email)) {
+                  const newUser = new User({
+                     email: args.email,
+                     password: bcrypt.hashSync(args.password, 12)
+                  });
+                  const user = await User.findOne({ email: args.email });
+                  if (user) {
+                     throw new Error(r.userExists);
+                  } else {
+                     const savedUser = await newUser.save();
+                     const token = await generateToken(savedUser);
+                     savedUser.token = token;
+                     savedUser.password = r.hidden;
+                     return savedUser;
+                  }
                } else {
-                  const savedUser = await newUser.save();
-                  const token = await generateToken(savedUser);
-                  savedUser.token = token;
-                  savedUser.password = r.hidden;
-                  return savedUser;
+                  throw new Error(r.invalidEmail);
                }
             } catch (error) {
                throw new Error(error.message);
@@ -308,14 +312,18 @@ const Mutation = new GraphQLObjectType({
          },
          async resolve(parent, args) {
             try {
-               const user = await User.findOne({ email: args.email });
-               if (user && bcrypt.compareSync(args.password, user.password)) {
-                  const token = await generateToken(user);
-                  user.token = token;
-                  user.password = r.hidden;
-                  return user;
+               if (r.mailRegex.test(args.email)) {
+                  const user = await User.findOne({ email: args.email });
+                  if (user && bcrypt.compareSync(args.password, user.password)) {
+                     const token = await generateToken(user);
+                     user.token = token;
+                     user.password = r.hidden;
+                     return user;
+                  } else {
+                     throw new Error(r.invalid);
+                  }
                } else {
-                  throw new Error(r.invalid);
+                  throw new Error(r.invalidEmail);
                }
             } catch (error) {
                throw new Error(error.message)
