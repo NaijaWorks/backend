@@ -1,5 +1,7 @@
 # NaijaHacks Hackathon 2019
 
+Click to view [Live App](https://naijaworks.netlify.com) |-- or --| [Server](https://naijaworks.herokuapp.com)
+
 ## Team NaijaWorks
 This is the backend repo for the
 [#Naijaworks](https://github.com/NaijaWorks) hackathon project. See frontend repo [here](https://github.com/NaijaWorks/frontend)
@@ -82,7 +84,7 @@ yarn server
 Using npm
 
 ```
-npm server
+npm run server
 ```     
 
 ### Start Frontend project on browser
@@ -97,4 +99,7 @@ Using npm
 
 ```
 npm start
-```     
+```
+
+### Postman Collection
+Click [here](https://explore.postman.com/templates/4603/naijaworks) to view detailed Endpoint documentation with Postman
