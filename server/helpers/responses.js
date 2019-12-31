@@ -4,7 +4,6 @@ module.exports = {
    invalid: "Invalid credentials",
    hidden: "Oops! Why do you want to see the password?",
    supplyToken: 'Please supply token!',
-   supplyToken: 'Please supply token!',
    invalidEmail: 'Not a valid email address format',
    invalidID: "User with id not found",
    missing: "Please include file in the request",
